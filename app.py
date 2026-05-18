@@ -2,6 +2,10 @@ import streamlit as st
 import pickle
 import requests
 
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
 def movie_poster(movie_id):
     url = "https://api.kinocheck.com/movies?tmdb_id={}".format(movie_id)
     data=requests.get(url)
@@ -32,7 +36,11 @@ def recommend(movie):
 movies=pickle.load(open('movies.pkl','rb'))
 movies_list=movies['title'].values
 
-similarity=pickle.load(open('similarity.pkl','rb'))
+#similarity=pickle.load(open('similarity.pkl','rb'))
+cv=CountVectorizer(max_features=5000,stop_words='english')
+vectors=cv.fit_transform(movies['tags']).toarray()
+
+similarity=cosine_similarity(vectors)
 
 
 st.title('Movie Recommender System')
